@@ -1,23 +1,22 @@
-// Array of image URLs to download
+// Image URLs as per test case
 const imageUrls = [
-  "https://via.placeholder.com/150",
-  "https://via.placeholder.com/200",
-  "https://via.placeholder.com/250",
-  "https://invalid-url.com/image.jpg" // Example of a broken URL (for testing error handling)
+  "https://picsum.photos/id/237/200/300",
+  "https://picsum.photos/id/238/200/300",
+  "https://picsum.photos/id/239/200/300"
 ];
 
-// Function that returns a Promise for each image download
+// Function to download a single image (returns a Promise)
 function downloadImage(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = url;
 
     img.onload = () => resolve(img);
-    img.onerror = () => reject(`Failed to download image: ${url}`);
+    img.onerror = () => reject(`Failed to load image: ${url}`);
   });
 }
 
-// Main function to handle the whole process
+// Main function to download and display all images
 function downloadImages(urls) {
   const outputDiv = document.getElementById("output");
   const errorDiv = document.getElementById("error");
@@ -25,36 +24,31 @@ function downloadImages(urls) {
 
   // Clear previous results
   outputDiv.innerHTML = "";
-  errorDiv.innerHTML = "";
+  errorDiv.textContent = "";
 
   // Show loading spinner
   loadingDiv.style.display = "block";
   loadingDiv.textContent = "Loading images...";
 
-  // Start downloading all images in parallel
-  const promises = urls.map(downloadImage);
-
-  Promise.all(promises)
+  // Download all images in parallel
+  Promise.all(urls.map(downloadImage))
     .then(images => {
       // Hide loading spinner
       loadingDiv.style.display = "none";
 
-      // Display all downloaded images
-      images.forEach(img => {
-        outputDiv.appendChild(img);
-      });
+      // Append images to output div
+      images.forEach(img => outputDiv.appendChild(img));
     })
     .catch(error => {
-      // Hide loading spinner
+      // Hide spinner and show error message
       loadingDiv.style.display = "none";
-
-      // Display error message
-      errorDiv.textContent = `Error: ${error}`;
+      errorDiv.textContent = error;
     });
 }
 
-// Call the function when page loads
-window.onload = function() {
+// Add click event listener to the button
+document.getElementById("download-images-button").addEventListener("click", () => {
   downloadImages(imageUrls);
-};
+});
+
 
